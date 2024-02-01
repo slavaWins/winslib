@@ -11,11 +11,14 @@ import java.util.List;
 
 public class InvSaver {
 
-    public static void saveInventory(Inventory inventory, String name) {
+    private static String GetFoolderByPluginName(String pluginName){
+        return "plugins/" + pluginName+"/inventories/";
+    }
+    public static void saveInventory(Inventory inventory, String name, String pluginName) {
         YamlConfiguration config = new YamlConfiguration();
         config.set("inventory", inventory.getContents());
         // Указать путь к файлу, в котором будет сохранен инвентарь
-        File file = new File("plugins/xmob/saves/" + name + ".yml");
+        File file = new File(GetFoolderByPluginName(pluginName) +  name + ".yml");
 
         try {
             config.save(file);
@@ -24,10 +27,10 @@ public class InvSaver {
         }
     }
 
-    public static Inventory getInvLoad(String name, int rows) {
+    public static Inventory getInvLoad(String name, int rows, String pluginName) {
         Inventory inv = Bukkit.createInventory(null, 9 * rows, "Загруженый " + name);
 
-        if (!loadInventory(inv, name)) {
+        if (!loadInventory(inv, name, pluginName)) {
             inv = null;
             return null;
         }
@@ -35,8 +38,8 @@ public class InvSaver {
         return inv;
     }
 
-    public static boolean loadInventory(Inventory inventory, String name) {
-        File file = new File("plugins/xmob/saves/" + name + ".yml");
+    public static boolean loadInventory(Inventory inventory, String name, String pluginName) {
+        File file = new File(GetFoolderByPluginName(pluginName) +  name + ".yml");
 
         if (file.exists()) {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -48,8 +51,8 @@ public class InvSaver {
     }
 
     // Загрузка инвентаря из файла
-    public static void remove(String name) {
-        File file = new File("plugins/xmob/saves/" + name + ".yml");
+    public static void remove(String name, String pluginName) {
+        File file = new File(GetFoolderByPluginName(pluginName) +  name + ".yml");
 
         if (!file.exists()) return;
 
