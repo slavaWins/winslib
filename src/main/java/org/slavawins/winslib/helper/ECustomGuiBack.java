@@ -1,5 +1,8 @@
 package org.slavawins.winslib.helper;
 
+/**
+ * Клас с иконами из респака
+ */
 public enum ECustomGuiBack {
 
     AVATAR_STALKER(""),
