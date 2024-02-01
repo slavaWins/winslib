@@ -14,6 +14,7 @@ public final class Winslib extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         instanse = this;
+
     }
 
     @Override
