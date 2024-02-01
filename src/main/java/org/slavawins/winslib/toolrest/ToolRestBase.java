@@ -25,7 +25,7 @@ public class ToolRestBase implements Listener {
     private JavaPlugin plugin;
 
 
-    public void GivePlayer(Player player) {
+    public final void GivePlayer(Player player) {
 
         PlayerInventory inventory = player.getInventory();
 
@@ -62,7 +62,7 @@ public class ToolRestBase implements Listener {
     }
 
 
-    private ToolRestModel ValidateEvent(Player player, ItemStack itemStack) {
+    private   ToolRestModel ValidateEvent(Player player, ItemStack itemStack) {
 
         if (!player.isOp()) return null;
         if (itemStack == null) return null;
@@ -76,7 +76,7 @@ public class ToolRestBase implements Listener {
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
+    public final void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
        // Bukkit.broadcastMessage(" TO onInteract");
@@ -92,7 +92,7 @@ public class ToolRestBase implements Listener {
     }
 
     @EventHandler
-    public void onInteractEntity(PlayerInteractAtEntityEvent event) {
+    public final void onInteractEntity(PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
 
 
