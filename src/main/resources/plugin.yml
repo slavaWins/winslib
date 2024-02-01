@@ -1,0 +1,4 @@
+name: winslib
+version: '${project.version}'
+main: org.slavawins.winslib.Winslib
+api-version: '1.20'
