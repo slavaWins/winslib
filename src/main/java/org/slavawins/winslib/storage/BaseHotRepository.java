@@ -51,6 +51,9 @@ public class BaseHotRepository<T extends IModelHotRepository> {
     public List<T> Get() {
         return myList;
     }
+    public List<T> GetAll() {
+        return myList;
+    }
 
     public Class<T[]> GetClass() {
         return null;

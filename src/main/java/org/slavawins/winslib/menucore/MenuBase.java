@@ -1,6 +1,7 @@
 package org.slavawins.winslib.menucore;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -12,7 +13,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.slavawins.winslib.Winslib;
+import org.slavawins.winslib.helper.ECustomGuiBack;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,27 +29,49 @@ public class MenuBase implements Listener {
     public String menuId = "";
     public int rows = 9;
     public String title = "nontitle";
-    private List<BtnMenuCoreContract> listBtns = new ArrayList<>();
+    public List<BtnMenuCoreContract> listBtns = new ArrayList<>();
     public Inventory guiInventory;
 
 
     public boolean isLockedAll = true;
     public boolean isChestMode = true;
 
-    public void setSize(int i) {
+    public final void setSize(int i) {
         this.rows = i;
     }
 
-    public void setTitle(String val) {
-        this.title = val;
+
+    /**
+     * Установить бэкграунд для инвентаря. Центрированый контейнер
+     * @param back
+     * @param text
+     */
+    public final void setBackground(ECustomGuiBack back,  String text) {
+        String val = ChatColor.WHITE + "" + ENegativeSpaceGui.WINDOW + back.toString();
+        if(text!=null)val+=text;
+        setTitle(val);
     }
 
-    public void setLockedAll(boolean val) {
+    public final void setTitle(String val) {
+        this.title = val;
+
+        if (guiInventory == null) return;
+        Inventory guiInventoryNew = Bukkit.createInventory(null, rows * 9, title);
+        guiInventoryNew.setContents(guiInventory.getContents());
+        guiInventory.clear();
+        guiInventory = null;
+    }
+
+    public final void setTitleUnicode(String val) {
+        this.title = ChatColor.WHITE + "" + val;
+    }
+
+    public final void setLockedAll(boolean val) {
         this.isLockedAll = val;
     }
 
 
-    public int PosToId(int x, int y) {
+    public final int PosToId(int x, int y) {
         if (x < 0 || x > 9 || y < 0 || y > rows) {
             return -1;
         }
@@ -54,23 +79,23 @@ public class MenuBase implements Listener {
         return id;
     }
 
-    public int getX(int id) {
-        if (id < 0 || id > rows*9-1) {
+    public final int getX(int id) {
+        if (id < 0 || id > rows * 9 - 1) {
             return -1;
         }
-        int x = ((id ) % 9) + 1;
+        int x = ((id) % 9) + 1;
         return x;
     }
 
-    public int getY(int id) {
-        if (id < 0 || id > rows*9-1) {
+    public final int getY(int id) {
+        if (id < 0 || id > rows * 9 - 1) {
             return -1;
         }
-        int y = (int)Math.ceil(id/9)+1;
+        int y = (int) Math.ceil(id / 9) + 1;
         return y;
     }
 
-    public void AddButton(int x, int y, Material mat, String name, String descr, String action) {
+    public final BtnMenuCoreContract AddButton(int x, int y, Material mat, String name, String descr, String action) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<>();
@@ -81,10 +106,10 @@ public class MenuBase implements Listener {
         meta.setDisplayName(name);
         item.setItemMeta(meta);
 
-        AddButtonItem(x, y, item, action, true);
+        return AddButtonItem(x, y, item, action, true);
     }
 
-    public void AddButtonItem(int x, int y, ItemStack item, String action, boolean isLockedBtn) {
+    public final BtnMenuCoreContract AddButtonItem(int x, int y, ItemStack item, String action, boolean isLockedBtn) {
 
 
         BtnMenuCoreContract btn = new BtnMenuCoreContract();
@@ -96,6 +121,7 @@ public class MenuBase implements Listener {
         btn.isLocked = isLockedBtn;
 
         this.listBtns.add(btn);
+        return btn;
     }
 
 
@@ -111,12 +137,14 @@ public class MenuBase implements Listener {
 
     }
 
-    public void Show(Player player) {
-        this.player = player;
 
-        Init();
+    public void ClearButtons() {
+        for (BtnMenuCoreContract btn : listBtns) {
+            guiInventory.setItem(btn.id, null);
+        }
+    }
 
-
+    public void RenderButtons() {
         for (BtnMenuCoreContract btn : listBtns) {
 
             if (btn.id > rows * 9 || btn.id < 0) {
@@ -125,6 +153,15 @@ public class MenuBase implements Listener {
             }
             guiInventory.setItem(btn.id, btn.item);
         }
+    }
+
+    public void Show(Player player) {
+        this.player = player;
+
+        Init();
+
+
+        RenderButtons();
 
 
         menuId = UUID.randomUUID().toString();
@@ -143,11 +180,12 @@ public class MenuBase implements Listener {
         player.openInventory(guiInventory);
     }
 
-    private void Delete() {
+
+    private final void Delete() {
 
         PMetaHelper.remove(player, MENU_META_KEY);
 
-      //  player.sendMessage("closed");
+        //  player.sendMessage("closed");
 
         //PlayerInteractEvent.getHandlerList().unregister(this);
         HandlerList.unregisterAll(this);
@@ -161,7 +199,7 @@ public class MenuBase implements Listener {
 
     }
 
-    public BtnMenuCoreContract GetBtn(int id) {
+    public final BtnMenuCoreContract GetBtn(int id) {
         for (BtnMenuCoreContract btn : listBtns) {
             if (btn.id == id) return btn;
         }
@@ -169,11 +207,11 @@ public class MenuBase implements Listener {
     }
 
     public void OnClickButton(BtnMenuCoreContract btn, ClickType clickType, ItemStack currentItemInMouse) {
-      //  player.sendMessage("CBTN:" + btn.action);
+        //  player.sendMessage("CBTN:" + btn.action);
     }
 
     public void OnClickEmpty(int id, ClickType clickType, ItemStack currentItemInMouse) {
-      //  player.sendMessage("CBTN to empty:" + id);
+        //  player.sendMessage("CBTN to empty:" + id);
     }
 
 
@@ -199,7 +237,7 @@ public class MenuBase implements Listener {
         if (clickedInventory == null) return;
 
         if (!clickedInventory.equals(guiInventory)) {
-          //  System.out.println("click in other inv");
+            //  System.out.println("click in other inv");
             return;//клиенул в другом инвентаре
         }
 
@@ -217,7 +255,7 @@ public class MenuBase implements Listener {
     }
 
 
-    public  void  OnCloseEvent(){
+    public void OnCloseEvent() {
 
     }
 
@@ -225,7 +263,7 @@ public class MenuBase implements Listener {
     public final void onCloseListner(InventoryCloseEvent e) {
 
 
-        if(!e.getInventory().equals(guiInventory))return;
+        if (!e.getInventory().equals(guiInventory)) return;
 
         OnCloseEvent();
 
