@@ -45,6 +45,22 @@ public class BaseColdRepository<T extends ModelCold> {
     }
 
 
+    public void remove(String name) {
+
+
+        T item = FindInRam(name);
+        if (item != null) {
+            cashedHot.remove(item);
+        }
+
+        File file = new File(dataFoolder, name + ".json");
+        if (!file.exists()) return;
+
+        if (!file.delete()) {
+            System.out.println("BaseColdRepository Error deleted " + name);
+        }
+    }
+
     public T FindByName(String name) {
 
         T res = FindInRam(name);
@@ -66,6 +82,7 @@ public class BaseColdRepository<T extends ModelCold> {
             m.updatedAt = Instant.now().getEpochSecond();
             if (IS_DEBUG) System.out.println("ADD IN RAM " + m.GetId());
             cashedHot.add(m);
+            reader.close();
             return m;
 
         } catch (IOException e) {
@@ -155,7 +172,7 @@ public class BaseColdRepository<T extends ModelCold> {
 
         for (File file : files) {
             if (file.isFile() && file.getName().endsWith(".json")) {
-                FindByName(file.getName().replace(".json",""));
+                FindByName(file.getName().replace(".json", ""));
             }
         }
 

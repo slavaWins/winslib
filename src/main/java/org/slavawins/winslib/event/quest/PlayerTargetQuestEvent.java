@@ -18,6 +18,7 @@ public class PlayerTargetQuestEvent extends Event {
     private final String eventType;
 
     public PlayerTargetQuestEvent(Player player, String eventType, String eventId, int amount) {
+        System.out.println(player.getName()+" makeevent: " + eventType+":"+eventId);
         this.player = player;
         this.eventType = eventType;
         this.amount = amount;

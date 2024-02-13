@@ -67,6 +67,7 @@ public class BaseHotRepository<T extends IModelHotRepository> {
             Reader reader = new FileReader(file);
             T[] n = gson.fromJson(reader, GetClass());
             myList = new ArrayList<>(Arrays.asList(n));
+            reader.close();
         }
     }
 

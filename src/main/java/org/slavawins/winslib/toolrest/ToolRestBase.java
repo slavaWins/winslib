@@ -1,10 +1,12 @@
 package org.slavawins.winslib.toolrest;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -25,6 +27,7 @@ public class ToolRestBase implements Listener {
     private JavaPlugin plugin;
 
 
+
     public final void GivePlayer(Player player) {
 
         PlayerInventory inventory = player.getInventory();
@@ -35,6 +38,9 @@ public class ToolRestBase implements Listener {
 
             ItemStack item = new ItemStack(tool.material);
 
+            if(tool.customItem!=null){
+                item = tool.customItem.clone();
+            }
 
             // item.addEnchantment(Enchantment.LUCK, 1);
 
@@ -79,14 +85,19 @@ public class ToolRestBase implements Listener {
     public final void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-       // Bukkit.broadcastMessage(" TO onInteract");
 
-        ItemStack itemStack = event.getItem();
+
+        ItemStack itemStack =player.getInventory().getItemInMainHand();
+
         ToolRestModel tool = ValidateEvent(player, itemStack);
 
         if (tool == null) return;
         event.setCancelled(true);
 
+        if(event.getHand() == EquipmentSlot.HAND && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        if(event.getHand() == EquipmentSlot.OFF_HAND && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        System.out.println("=============CLICK");
         tool.OnPlayerInteractEvent(player, itemStack, event.getAction(), event.getClickedBlock());
 
     }

@@ -16,6 +16,7 @@ public class ToolRestModel {
      */
     public String callCommand = "";
     public Material material = Material.STONE_SWORD;
+    public ItemStack customItem;
     public String desctiption = "Предмет для редактирования и администрирования";
 
     public static ToolRestModel New(String name, Material material, String s) {

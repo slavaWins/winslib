@@ -15,7 +15,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.slavawins.winslib.Winslib;
 import org.slavawins.winslib.helper.ECustomGuiBack;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +26,7 @@ public class MenuBase implements Listener {
     public Player player;
 
     public String menuId = "";
-    public int rows = 9;
+    public int rows = 6;
     public String title = "nontitle";
     public List<BtnMenuCoreContract> listBtns = new ArrayList<>();
     public Inventory guiInventory;
@@ -43,23 +42,32 @@ public class MenuBase implements Listener {
 
     /**
      * Установить бэкграунд для инвентаря. Центрированый контейнер
+     *
      * @param back
      * @param text
      */
-    public final void setBackground(ECustomGuiBack back,  String text) {
+    public final void setBackground(ECustomGuiBack back, String text) {
         String val = ChatColor.WHITE + "" + ENegativeSpaceGui.WINDOW + back.toString();
-        if(text!=null)val+=text;
+        if (text != null) val += text;
         setTitle(val);
+    }
+
+    public final void recreateInv() {
+        if (guiInventory == null) return;
+        Inventory guiInventoryNew = Bukkit.createInventory(null, rows * 9, title);
+        guiInventoryNew.setContents(guiInventory.getContents());
+        guiInventory.clear();
+        Inventory old = guiInventory;
+        guiInventory = guiInventoryNew;
+        guiInventoryNew = null;
+
+        player.closeInventory();
+        player.openInventory(guiInventory);
     }
 
     public final void setTitle(String val) {
         this.title = val;
 
-        if (guiInventory == null) return;
-        Inventory guiInventoryNew = Bukkit.createInventory(null, rows * 9, title);
-        guiInventoryNew.setContents(guiInventory.getContents());
-        guiInventory.clear();
-        guiInventory = null;
     }
 
     public final void setTitleUnicode(String val) {
@@ -119,7 +127,7 @@ public class MenuBase implements Listener {
         btn.action = action;
         btn.id = PosToId(x, y);
         btn.isLocked = isLockedBtn;
-
+        btn.menuBase = this;
         this.listBtns.add(btn);
         return btn;
     }
@@ -155,12 +163,17 @@ public class MenuBase implements Listener {
         }
     }
 
-    public void Show(Player player) {
+    public void onShow() {
+
+    }
+
+    public final void Show(Player player) {
         this.player = player;
 
         Init();
 
 
+        onShow();
         RenderButtons();
 
 
@@ -219,6 +232,8 @@ public class MenuBase implements Listener {
     public final void eventonClick(InventoryClickEvent e) {
 
 
+        if (guiInventory == null) return;
+
         Player player = (Player) e.getWhoClicked();
         if (!player.hasMetadata(MENU_META_KEY)) return;
 
@@ -245,6 +260,9 @@ public class MenuBase implements Listener {
         BtnMenuCoreContract btn = GetBtn(e.getSlot());
         if (btn != null) {
             OnClickButton(btn, e.getClick(), e.getCurrentItem());
+            if (btn.event != null) {
+                btn.event.accept(btn);
+            }
             if (btn.isLocked || isLockedAll) e.setCancelled(true);
 
         } else {
@@ -267,10 +285,19 @@ public class MenuBase implements Listener {
 
         OnCloseEvent();
 
+        guiInventory.clear();
+        guiInventory = null;
+
         Delete();
 
 
     }
 
 
+    public void SetItemInButton(BtnMenuCoreContract b, ItemStack item) {
+        guiInventory.remove(b.item);
+        b.item = null;
+        b.item = item;
+        guiInventory.setItem(PosToId(b.x, b.y), item);
+    }
 }

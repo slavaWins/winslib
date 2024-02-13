@@ -1,6 +1,7 @@
 package org.slavawins.winslib;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.slavawins.winslib.listener.AuthCommandListner;
 
 public final class Winslib extends JavaPlugin {
 
@@ -15,6 +16,8 @@ public final class Winslib extends JavaPlugin {
         // Plugin startup logic
         instanse = this;
 
+        getServer().getPluginManager().registerEvents(new AuthCommandListner(), this);
+        getCommand("winslibauthevent").setExecutor(new AuthCommandListner());
     }
 
     @Override
